@@ -1,0 +1,12 @@
+Requirements
+
+Desarrollar un script PHP, usando la API de Twillio de telefonia o alguna similar, que tome como entrada un archivo CSV con un listado de numeros de telefonos en formato internacional y realice una llamada a cada uno de esos numeros durante X segundos (valor parametrizable como argumento) y corte. El script deberia guardar en un archivo e imprimir por consola el resultado de la llamada (es decir, si se conecto correctamente, si atendieron, si no atendieron, de ser posible si atendio el contestador, etc). Te pido crees un repositorio en bitbucket y me des acceso para lectura (@mcocaro).
+
+Highlights
+- Twilio API
+- CSV
+- External configuration
+- Log process output
+- Bitbucket
+
+~
