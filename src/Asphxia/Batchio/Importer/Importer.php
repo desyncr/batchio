@@ -1,15 +1,15 @@
 <?php
 namespace Asphxia\Batchio\Importer;
-use Asphxia\Batchio\Importer\Drivers\DriverInterface;
+use Asphxia\Batchio\Importer\Drivers\ImporterInterface;
 
-class Importer {
-    public function setInput($input) {
-        $this->input = $input;
-    }
-    public function setDriver(DriverInterface $driver) {
+class Importer implements ImporterInterface {
+    public function __construct(ImporterInterface $driver) {
         $this->driver = $driver;
     }
+    public function setInput($input) {
+        $this->driver->setInput($input);
+    }
     public function process() {
-        return $this->driver->import($this->input);
+        return $this->driver->process();
     }
 }

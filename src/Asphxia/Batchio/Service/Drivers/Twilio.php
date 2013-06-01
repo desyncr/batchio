@@ -1,6 +1,8 @@
 <?php
-namespace Asphxia\Batchio;
-class BatchioTwilio {
+namespace Asphxia\Batchio\Service\Drivers;
+use Asphxia\Batchio\Service\Drivers\ServiceInterface;
+
+class Twilio implements ServiceInterface {
     private $token;
     private $sid;
     private $callerId;
@@ -14,7 +16,7 @@ class BatchioTwilio {
     public function setCallerId($callerId) {
         $this->callerId = $callerId;
     }
-    public function setStatusCallbackUrl($url) {
+    public function setCallbackUrl($url) {
         $this->statusCallbackUrl = $url;
     }
     public function setRecipient($recipient) {

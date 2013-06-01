@@ -1,14 +1,14 @@
 <?php
 namespace Asphxia\Batchio;
+use Asphxia\Batchio\Service;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-class BatchioCommand extends Command
+class Command extends \Symfony\Component\Console\Command\Command
 {
     protected function configure()
     {
@@ -54,18 +54,12 @@ class BatchioCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {   
-        // TODO refactor Batchio\Importer\Drivers
-        $importer = new Importer\Importer();
-        $importer->setInput($this->data);
-        
-        // TODO refactor Importer\Drivers\Csv , Importer\Factory
-        $importer->setDriver(new Importer\Drivers\Csv());
+        $importer = new Importer\Importer(new Importer\Drivers\Csv($this->data));
         $items = $importer->process();
-        
-        // TODO refactor BatchioTwilio -> Batchio\Service($driver) / Batchio\Service\Twilio
-        $twilio = new BatchioTwilio($this->sid, $this->token);
+
+        $twilio = new Service\Service(new Service\Drivers\Twilio($this->sid, $this->token));
         $twilio->setCallerId($this->callerId);
-        $twilio->setStatusCallbackUrl($this->callbackUrl);
+        $twilio->setCallbackUrl($this->callbackUrl);
 
         $result = [];
         foreach ($items as $item) {

@@ -1,10 +1,10 @@
 <?php
 require_once('vendor/autoload.php');
 use Symfony\Component\Console\Application;
-use Asphxia\Batchio\BatchioCommand;
+use Asphxia\Batchio;
 
 $application = new Application();
 
-$application->add(new BatchioCommand());
+$application->add(new Batchio\Command());
  
 $application->run();
