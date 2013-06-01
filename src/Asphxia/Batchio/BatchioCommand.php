@@ -54,12 +54,25 @@ class BatchioCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $input = $input->getArgument('input');
+        $data = $input->getArgument('input');
+        $sync = $input->getOption('sync');
         
+        // TODO refactor Batchio\Importer\Drivers
         $importer = new BatchioImporter();
-        $importer->setInput($input);
+        $importer->setInput($data);
+        
+        // TODO refactor Importer\Drivers\Csv , Importer\Factory
         $importer->setDriver(new ImporterDrivers\ImporterCsv());
-        $importer->process();
+        $items = $importer->process();
+        
+        // TODO refactor BatchioTwilio -> BatchioService($driver) / BatchioService\Twilio
+        $twilio = new BatchioTwilio('caller', 'statusCallbackUrl');
+        $result = [];
+        foreach ($items as $item) {
+            $twilio->setCaller($item['number']);
+            $twilio->call(array('sync' => $sync), $result);
+            $output->writeln($result['message']);
+        }
         
         $output->writeln('Batchio');
     }

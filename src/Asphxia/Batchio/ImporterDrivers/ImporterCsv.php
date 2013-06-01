@@ -14,7 +14,10 @@ class ImporterCsv implements ImporterInterface {
         $items = [];
 
         $interpreter->addObserver(function(array $columns) use (&$items) {
-            array_push($items, $columns);
+            $element = array(
+                'number'  => $columns[0]
+            );
+            array_push($items, $element);
         });
 
         $lexer->parse($filename, $interpreter);
