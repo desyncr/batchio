@@ -1,7 +1,22 @@
-twilio:
-  sid: "XXX"
-  token: "YYY"
-  caller: "ZZZ"
-  callbackUrl: "http://example.com/callback"
+service:
+  driver: twilio
+
+  twilio:
+    sid: ""
+    token: ""
+    caller: ""
+    callbackUrl: "http://example.com/twilio/callback.me"
+
 env:
-  "development"
+  development
+
+syncr:
+  driver: db
+
+  db:
+    max_attemps: 5
+    attemps_delay: 5
+    hostname: localhost
+    username: example
+    password: example
+    database: batchio
