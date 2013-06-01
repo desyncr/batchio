@@ -54,6 +54,13 @@ class BatchioCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $input = $input->getArgument('input');
+        
+        $importer = new BatchioImporter();
+        $importer->setInput($input);
+        $importer->setDriver(new ImporterDrivers\ImporterCsv());
+        $importer->process();
+        
         $output->writeln('Batchio');
     }
 }
