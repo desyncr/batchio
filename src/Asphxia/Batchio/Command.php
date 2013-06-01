@@ -57,14 +57,15 @@ class Command extends \Symfony\Component\Console\Command\Command
         $importer = new Importer\Importer(new Importer\Drivers\Csv($this->data));
         $items = $importer->process();
 
-        $twilio = new Service\Service(new Service\Drivers\Twilio($this->sid, $this->token));
-        $twilio->setCallerId($this->callerId);
-        $twilio->setCallbackUrl($this->callbackUrl);
+        $service = new Service\Service(new Service\Drivers\Twilio($this->sid, $this->token));
+        $service->setCallerId($this->callerId);
+        $service->setCallbackUrl($this->callbackUrl);
 
+        // TODO: refactor: move to service\driver and provide callback to output
         $result = [];
         foreach ($items as $item) {
-            $twilio->setRecipient($item['number']);
-            if ($this->env == 'production') $twilio->call(array('sync' => $this->sync), $result);
+            $service->setRecipient($item['number']);
+            if ($this->env == 'production') $service->call(array('sync' => $this->sync), $result);
 
             $output->writeln(print_r($result,1));
         }
