@@ -1,0 +1,7 @@
+twilio:
+  sid: "XXX"
+  token: "YYY"
+  caller: "ZZZ"
+  callbackUrl: "http://example.com/callback"
+env:
+  "development"

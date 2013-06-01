@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class BatchioCommand extends Command
 {
@@ -20,43 +21,9 @@ class BatchioCommand extends Command
                 'Input data to use'
             )
             ->addArgument(
-               'sid',
+               'config',
                InputArgument::REQUIRED,
-               'Twilio SID'
-            )
-            ->addArgument(
-               'token',
-               InputArgument::REQUIRED,
-               'Twilio Token'
-            )
-            ->addArgument(
-               'caller',
-               InputArgument::REQUIRED,
-               'Caller Id'
-            )
-            ->addOption(
-               'callbackUrl',
-               null,
-               InputOption::VALUE_REQUIRED,
-               'Status Callback URI'
-            )
-            ->addOption(
-               'format',
-               'f',
-               InputOption::VALUE_OPTIONAL,
-               'Input format. Currently supports only .csv'
-            )
-            ->addOption(
-               'output-format',
-               'o',
-               InputOption::VALUE_OPTIONAL,
-               'Output format'
-            )
-            ->addOption(
-               'pipe',
-               'p',
-               InputOption::VALUE_OPTIONAL,
-               'Pipe output to file'
+               'Twilio Configuration'
             )
             ->addOption(
                'sync',
@@ -64,46 +31,49 @@ class BatchioCommand extends Command
                InputOption::VALUE_OPTIONAL,
                'Force synchronization'
             )
-            ->addOption(
-               'delay',
-               'd',
-               InputOption::VALUE_OPTIONAL,
-               'Delay between calls'
-            )
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $data = $input->getArgument('input');
-        
-        $sid = $input->getArgument('sid');
-        $token = $input->getArgument('token');
-        $callerId = $input->getArgument('caller');
-        $callbackUrl = $input->getOption('callbackUrl');
+    protected function initialize(InputInterface $input, OutputInterface $output) {
+        parent::initialize($input, $output);
 
-        $sync = $input->getOption('sync');
+        $this->data = $input->getArgument('input');
         
+        $configFile = $input->getArgument('config');
+        $configuration = Yaml::parse($configFile);
+
+        $this->sid = $configuration['twilio']['sid'];
+        $this->token = $configuration['twilio']['token'];
+        $this->callerId = $configuration['twilio']['caller'];
+        $this->callbackUrl = $configuration['twilio']['callbackUrl'];
+
+        $this->sync = $input->getOption('sync');
+        
+        $this->env = $configuration['env'];
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {   
         // TODO refactor Batchio\Importer\Drivers
         $importer = new BatchioImporter();
-        $importer->setInput($data);
+        $importer->setInput($this->data);
         
         // TODO refactor Importer\Drivers\Csv , Importer\Factory
         $importer->setDriver(new ImporterDrivers\ImporterCsv());
         $items = $importer->process();
         
         // TODO refactor BatchioTwilio -> Batchio\Service($driver) / Batchio\Service\Twilio
-        $twilio = new BatchioTwilio($sid, $token);
-        $twilio->setCallerId($callerId);
-        $twilio->setStatusCallbackUrl($callbackUrl);
+        $twilio = new BatchioTwilio($this->sid, $this->token);
+        $twilio->setCallerId($this->callerId);
+        $twilio->setStatusCallbackUrl($this->callbackUrl);
 
         $result = [];
         foreach ($items as $item) {
             $twilio->setRecipient($item['number']);
-            $twilio->call(array('sync' => $sync), $result);
+            if ($this->env == 'production') $twilio->call(array('sync' => $this->sync), $result);
+
             $output->writeln(print_r($result,1));
         }
-        
         $output->writeln('Batchio');
     }
 }
