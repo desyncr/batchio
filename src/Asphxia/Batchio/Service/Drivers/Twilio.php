@@ -77,8 +77,16 @@ class Twilio implements ServiceInterface {
         $message = $this->client->account->sms_messages->create(
             $this->callerId, $this->recipient, $text, array('StatusCallback'=>$this->statusCallbackUrl)
         );
+        
+        $arrMessage = array(
+            'account_sid'   => $message->account_sid,
+            'sid'           => $message->sid,
+            'to'            => $message->to,
+            'from'          => $message->from,
+            'status'        => $message->status
+        );
 
-        if ($callback) $callback->callback($message);
+        if ($callback) $callback->callback($arrMessage);
         return $result = $message;
     }
 

@@ -16,12 +16,39 @@ class Syncr implements SyncrInterface {
     private $driver;
     private $observers = [];
 
+    /**
+     * Sets the syncr driver
+     *
+     * @param \Asphxia\Batchio\Syncr\Drivers\SyncrInterface $driver
+     */
     public function __construct(SyncrInterface $driver) {
         $this->driver = $driver;
     }
+    
+    /**
+     * 
+     * @param Array $configuration
+     */
+    public function bootstrap(Array $configuration) {
+        $this->driver->bootstrap($configuration);
+    }
+    
+    /**
+     * Adds a new observer
+     * 
+     * @param Callable $function
+     */
     public function addObserver($function) {
+        // TODO make observers removable
         array_push($this->observers, $function);
     }
+    
+    /**
+     * Calls the drivers callback function to process result
+     * 
+     * @param Array $result
+     * @return Array
+     */
     public function callback(Array &$result) {
         $result = $this->driver->callback($result);
         foreach ($this->observers as $observer) {

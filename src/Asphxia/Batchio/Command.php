@@ -64,6 +64,24 @@ class Command extends \Symfony\Component\Console\Command\Command
         $this->service['configuration'] = $configuration['service'][$driver];
 
         $this->sync = $input->getOption('sync');
+        $this->syncr = null;
+
+        if ($this->sync) {
+            $syncr['driver'] = $driver = $configuration['syncr']['driver'];
+            $syncr['configuration'] = $configuration['syncr'][$driver];
+            
+            $this->syncr = new Syncr\Syncr(new Syncr\Drivers\Db());
+            $this->syncr->bootstrap($syncr['configuration']);
+
+            $this->syncr->addObserver(function ($result) use ($output) {
+                $sid    = $result['sid'];
+                $to     = $result['to'];
+                $from   = $result['from'];
+                $status = $result['status'];
+
+                $output->writeln("$sid\t$to\t$from\t$status");
+            });
+        }
         
         $this->env = $configuration['env'];
     }
@@ -82,23 +100,13 @@ class Command extends \Symfony\Component\Console\Command\Command
         // TODO: refactor: Service\Factory::create($configuration['service'])
         $service = new Service\Service(new Service\Drivers\Twilio());
         $service->bootstrap($this->service['configuration']);
-        
-        $syncr = new Syncr\Syncr(new Syncr\Drivers\Db());
-        $syncr->addObserver(function ($result) use ($output) {
-            $sid    = $result['sid'];
-            $to     = $result['to'];
-            $from   = $result['from'];
-            $status = $result['status'];
 
-            $output->writeln("$sid\t$to\t$from\t$status");
-        });
-        
         // TODO: refactor: move to service\driver and provide callback to output
         $result = [];
         foreach ($items as $item) {
             $service->setRecipient($item['number']);
             if ($this->env == 'production') {
-                $service->call(array('sync' => $this->sync), $result, $syncr);
+                $service->call(array('sync' => $this->sync), $result, $this->syncr);
             }
         }
         $output->writeln('Batchio');
