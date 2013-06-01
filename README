@@ -7,6 +7,11 @@ Usage
 
 php ./app.php batchio:run --sync=1 /path/to/file.csv /path/to/config.yml
 
+Output:
+AC00000000000000000000000000000000	+000000000000	+00000000000	sent
+
+(Columns are Account SID, recipient number, Twilio number calling from and status)
+
 Components
 
 There is a web service component (Backio[https://bitbucket.org/dcavuotti/backio])
