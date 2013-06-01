@@ -27,6 +27,14 @@ class Syncr implements SyncrInterface {
     
     /**
      * 
+     * @param array $result
+     */
+    public function sync(Array $result) {
+        $this->driver->sync($result);
+    }
+    
+    /**
+     * 
      * @param Array $configuration
      */
     public function bootstrap(Array $configuration) {

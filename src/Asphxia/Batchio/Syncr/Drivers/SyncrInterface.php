@@ -7,5 +7,6 @@
  */
 namespace Asphxia\Batchio\Syncr\Drivers;
 interface SyncrInterface {
+    public function sync(Array $result);
     public function callback(Array &$result);
 }

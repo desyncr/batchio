@@ -35,6 +35,20 @@ class Db implements SyncrInterface {
     /**
      * 
      * @param Array $result
+     */
+    public function sync(Array $result) {
+        $query = $this->dbh->prepare("INSERT INTO calls (sid,status,account_sid, call_from, call_to) VALUES (:sid, :status, :account_sid, :call_from, :call_to)");
+        $query->bindParam(':sid', $result['sid']);
+        $query->bindParam(':status', $result['status']);
+        $query->bindParam(':account_sid', $result['account_sid']);
+        $query->bindParam(':call_from', $result['call_from']);
+        $query->bindParam(':call_to', $result['call_to']);
+        $query->execute();
+    }
+
+    /**
+     * 
+     * @param Array $result
      * @return Array
      */
     public function callback(Array &$result) {        
