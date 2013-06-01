@@ -1,3 +1,27 @@
+Batchio
+
+Batchio is a little tool to take a batch of numbers and, using Twilio services, 
+make Calls/Send text and log the output.
+
+Usage
+
+php ./app.php batchio:run --sync=1 /path/to/file.csv /path/to/config.yml
+
+Components
+
+There is a web service component (Backio[https://bitbucket.org/dcavuotti/backio])
+which deals with syncing both the console application and the service status (which
+btw is asynchronous).
+
+Backio re-uses Batchio components (Syncr) to communicate with Batchio processing.
+
+The application uses the following components from different sources through Composer:
+
+- Symfony's Console component [https://github.com/symfony/Console]
+- Symfony's Yaml component [https://github.com/symfony/Yaml]
+- Goodby's csv library [https://github.com/goodby/csv]
+- Twilio's sdk [https://github.com/twilio/twilio-php]
+
 Requirements
 
 Desarrollar un script PHP, usando la API de Twillio de telefonia o alguna similar,
@@ -10,6 +34,7 @@ el contestador, etc). Te pido crees un repositorio en bitbucket y me des acceso
 para lectura (@mcocaro).
 
 Highlights
+
 - Twilio API
 - CSV
 - External configuration
