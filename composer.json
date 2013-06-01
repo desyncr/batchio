@@ -1,7 +1,8 @@
 {
   "require": {
     "symfony/console": "2.*",
-    "goodby/csv": "1.0.*"
+    "goodby/csv": "1.0.*",
+    "twilio/sdk": "3.10.*"
   },
   "autoload": {
     "psr-0": {

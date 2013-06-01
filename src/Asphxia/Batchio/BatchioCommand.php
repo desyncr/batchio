@@ -19,6 +19,27 @@ class BatchioCommand extends Command
                 InputArgument::REQUIRED,
                 'Input data to use'
             )
+            ->addArgument(
+               'sid',
+               InputArgument::REQUIRED,
+               'Twilio SID'
+            )
+            ->addArgument(
+               'token',
+               InputArgument::REQUIRED,
+               'Twilio Token'
+            )
+            ->addArgument(
+               'caller',
+               InputArgument::REQUIRED,
+               'Caller Id'
+            )
+            ->addOption(
+               'callbackUrl',
+               null,
+               InputOption::VALUE_REQUIRED,
+               'Status Callback URI'
+            )
             ->addOption(
                'format',
                'f',
@@ -55,6 +76,12 @@ class BatchioCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $data = $input->getArgument('input');
+        
+        $sid = $input->getArgument('sid');
+        $token = $input->getArgument('token');
+        $callerId = $input->getArgument('caller');
+        $callbackUrl = $input->getOption('callbackUrl');
+
         $sync = $input->getOption('sync');
         
         // TODO refactor Batchio\Importer\Drivers
@@ -65,13 +92,16 @@ class BatchioCommand extends Command
         $importer->setDriver(new ImporterDrivers\ImporterCsv());
         $items = $importer->process();
         
-        // TODO refactor BatchioTwilio -> BatchioService($driver) / BatchioService\Twilio
-        $twilio = new BatchioTwilio('caller', 'statusCallbackUrl');
+        // TODO refactor BatchioTwilio -> Batchio\Service($driver) / Batchio\Service\Twilio
+        $twilio = new BatchioTwilio($sid, $token);
+        $twilio->setCallerId($callerId);
+        $twilio->setStatusCallbackUrl($callbackUrl);
+
         $result = [];
         foreach ($items as $item) {
-            $twilio->setCaller($item['number']);
+            $twilio->setRecipient($item['number']);
             $twilio->call(array('sync' => $sync), $result);
-            $output->writeln($result['message']);
+            $output->writeln(print_r($result,1));
         }
         
         $output->writeln('Batchio');
