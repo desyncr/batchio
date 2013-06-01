@@ -55,11 +55,11 @@ class BatchioCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {   
         // TODO refactor Batchio\Importer\Drivers
-        $importer = new BatchioImporter();
+        $importer = new Importer\Importer();
         $importer->setInput($this->data);
         
         // TODO refactor Importer\Drivers\Csv , Importer\Factory
-        $importer->setDriver(new ImporterDrivers\ImporterCsv());
+        $importer->setDriver(new Importer\Drivers\Csv());
         $items = $importer->process();
         
         // TODO refactor BatchioTwilio -> Batchio\Service($driver) / Batchio\Service\Twilio

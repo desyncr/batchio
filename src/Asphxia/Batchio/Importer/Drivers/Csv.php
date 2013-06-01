@@ -1,10 +1,10 @@
 <?php
-namespace Asphxia\Batchio\ImporterDrivers;
+namespace Asphxia\Batchio\Importer\Drivers;
 use Goodby\CSV\Import\Standard\Lexer;
 use Goodby\CSV\Import\Standard\Interpreter;
 use Goodby\CSV\Import\Standard\LexerConfig;
 
-class ImporterCsv implements ImporterInterface {
+class Csv implements DriverInterface {
     public function import($filename) {
         $config = new LexerConfig();
         $lexer = new Lexer($config);
