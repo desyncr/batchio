@@ -20,18 +20,6 @@ class Twilio implements ServiceInterface {
     private $statusCallbackUrl;
 
     /**
-     * Instantiates a new Twilio driver
-     * 
-     * @param String $sid SID @see twilio.com/user/account
-     * @param String $token Token  @see twilio.com/user/account
-     */
-    public function __construct($sid, $token) {
-        $this->sid = $sid;
-        $this->token = $token;
-        $this->client = new \Services_Twilio($sid, $token);
-    }
-    
-    /**
      * Sets the caller ID
      * 
      * @param String $callerId
@@ -50,6 +38,24 @@ class Twilio implements ServiceInterface {
     }
     
     /**
+     * Sets service SID
+     * 
+     * @param String $sid SID @see twilio.com/user/account
+     */
+    public function setSid($sid) {
+        $this->sid = $sid;
+    }
+
+    /**
+     * Sets service token
+     *
+     * @param String $token Token  @see twilio.com/user/account
+     */
+    public function setToken($token) {
+        $this->token = $token;
+    }
+    
+    /**
      * Sets the recipient number
      * 
      * @param String $recipient
@@ -65,14 +71,29 @@ class Twilio implements ServiceInterface {
      * @param Array $result
      * @return Array
      */
-    public function call($options, &$result) {
+    public function call(Array $options, Array &$result, $callback = null) {
         $text = isset($options['message']) ? $options['message'] : 'Hello there!';
 
         $message = $this->client->account->sms_messages->create(
-            $this->callerId, $this->recipient, $text
+            $this->callerId, $this->recipient, $text, array('StatusCallback'=>$this->statusCallbackUrl)
         );
 
+        if ($callback) $callback->callback($message);
         return $result = $message;
+    }
+
+    /**
+     * Instantiates a new Twilio driver
+     * 
+     * @param Array $configuration
+     */
+    public function bootstrap(Array $configuration) {
+        $this->setCallbackUrl($configuration['callbackUrl']);
+        $this->setCallerId($configuration['caller']);
+        $this->setSid($configuration['sid']);
+        $this->setToken($configuration['token']);
+        
+        $this->client = new \Services_Twilio($this->sid, $this->token);
     }
     
 }

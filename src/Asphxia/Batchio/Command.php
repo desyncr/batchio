@@ -59,10 +59,9 @@ class Command extends \Symfony\Component\Console\Command\Command
         $configFile = $input->getArgument('config');
         $configuration = Yaml::parse($configFile);
 
-        $this->sid = $configuration['twilio']['sid'];
-        $this->token = $configuration['twilio']['token'];
-        $this->callerId = $configuration['twilio']['caller'];
-        $this->callbackUrl = $configuration['twilio']['callbackUrl'];
+        // TODO: refactor: remove twilio -> $c[$c['service']]['sid'] etc, move to server's configuration
+        $this->service['driver'] = $driver = $configuration['service']['driver'];
+        $this->service['configuration'] = $configuration['service'][$driver];
 
         $this->sync = $input->getOption('sync');
         
@@ -80,17 +79,27 @@ class Command extends \Symfony\Component\Console\Command\Command
         $importer = new Importer\Importer(new Importer\Drivers\Csv($this->data));
         $items = $importer->process();
 
-        $service = new Service\Service(new Service\Drivers\Twilio($this->sid, $this->token));
-        $service->setCallerId($this->callerId);
-        $service->setCallbackUrl($this->callbackUrl);
+        // TODO: refactor: Service\Factory::create($configuration['service'])
+        $service = new Service\Service(new Service\Drivers\Twilio());
+        $service->bootstrap($this->service['configuration']);
+        
+        $syncr = new Syncr\Syncr(new Syncr\Drivers\Db());
+        $syncr->addObserver(function ($result) use ($output) {
+            $sid    = $result['sid'];
+            $to     = $result['to'];
+            $from   = $result['from'];
+            $status = $result['status'];
 
+            $output->writeln("$sid\t$to\t$from\t$status");
+        });
+        
         // TODO: refactor: move to service\driver and provide callback to output
         $result = [];
         foreach ($items as $item) {
             $service->setRecipient($item['number']);
-            if ($this->env == 'production') $service->call(array('sync' => $this->sync), $result);
-
-            $output->writeln(print_r($result,1));
+            if ($this->env == 'production') {
+                $service->call(array('sync' => $this->sync), $result, $syncr);
+            }
         }
         $output->writeln('Batchio');
     }

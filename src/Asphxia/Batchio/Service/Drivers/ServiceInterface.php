@@ -27,4 +27,20 @@ interface ServiceInterface {
      * @param String $recipient
      */
     public function setRecipient($recipient);
+    
+    /**
+     * Makes a service call on the given driver
+     * 
+     * @param Array $options
+     * @param Array $result
+     * @param Callable $callback
+     */
+    public function call(Array $options, Array &$result, $callback);
+    
+    /**
+     * Driver self configuration 
+     * 
+     * @param Array $configuration
+     */
+    public function bootstrap(Array $configuration);
 }

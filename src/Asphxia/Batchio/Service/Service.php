@@ -29,4 +29,10 @@ class Service implements ServiceInterface {
     public function setRecipient($recipient) {
         $this->driver->setRecipient($recipient);
     }
+    public function call(Array $options, Array &$result, $callback = null) {
+        $this->driver->call($options, $result, $callback);
+    }
+    public function bootstrap(Array $configuration) {
+        $this->driver->bootstrap($configuration);
+    }
 }
