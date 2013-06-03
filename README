@@ -1,26 +1,28 @@
-Batchio
+# Batchio
+
+---
 
 Batchio is a little tool to take a batch of numbers and, using Twilio services, 
 make Calls/Send text and log the output.
 
-Usage
+## Usage
 
-php ./app.php batchio:run --sync=1 /path/to/file.csv /path/to/config.yml
+    php ./app.php batchio:run --sync=1 /path/to/file.csv /path/to/config.yml
 
-Output:
-AC00000000000000000000000000000000	+000000000000	+00000000000	sent
+    Output:
+    AC00000000000000000000000000000000    +000000000000	+00000000000	sent
 
 (Columns are Account SID, recipient number, Twilio number calling from and status)
 
-Components
+## Components
 
-There is a web service component (Backio[https://bitbucket.org/dcavuotti/backio])
+There is a web service component ([Backio][1])
 which deals with syncing both the console application and the service status (which
 btw is asynchronous).
 
 Backio re-uses Batchio components (Syncr) to communicate with Batchio processing.
 
-In order to use the Syncr\Db component you must create the table it uses:
+In order to use the `Syncr\Db` component you must create the table it uses:
 
     CREATE TABLE calls (
         id INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -31,7 +33,9 @@ In order to use the Syncr\Db component you must create the table it uses:
         call_to VARCHAR(128) NOT NULL
     ) ENGINE = MYISAM;
 
+
 Then configure syncr\driver and syncr\db in the configuration file:
+
     syncr:
       driver: db
 
@@ -43,14 +47,15 @@ Then configure syncr\driver and syncr\db in the configuration file:
         password: example
         database: batchio
 
-The application uses the following components from different sources through Composer:
+The application uses the following components from different sources through [Composer][2]:
 
 - Symfony's Console component [https://github.com/symfony/Console]
 - Symfony's Yaml component [https://github.com/symfony/Yaml]
 - Goodby's csv library [https://github.com/goodby/csv]
 - Twilio's sdk [https://github.com/twilio/twilio-php]
 
-To Do
+## To Do
+
 - Make input format configurable. Currently it only supports CSV and an specific
 format (a single column of numbers).
 
@@ -60,18 +65,7 @@ format (a single column of numbers).
 
 - Add other services.
 
-Requirements
-
-Desarrollar un script PHP, usando la API de Twillio de telefonia o alguna similar,
-que tome como entrada un archivo CSV con un listado de numeros de telefonos en
-formato internacional y realice una llamada a cada uno de esos numeros durante X
-segundos (valor parametrizable como argumento) y corte. El script deberia guardar
-en un archivo e imprimir por consola el resultado de la llamada (es decir, si se
-conecto correctamente, si atendieron, si no atendieron, de ser posible si atendio
-el contestador, etc). Te pido crees un repositorio en bitbucket y me des acceso
-para lectura (@mcocaro).
-
-Highlights
+## Highlights
 
 - Twilio API
 - CSV
@@ -80,3 +74,5 @@ Highlights
 - Bitbucket
 
 ~
+[1]: https://bitbucket.org/dcavuotti/backio
+[2]: http://getcomposer.org
